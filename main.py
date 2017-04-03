@@ -46,77 +46,80 @@ class MainHandler(webapp2.RequestHandler):
         e.g. www.usersignup.com/
     """
     def get(self):
-        edit_header = "<h3>H3 Header from the Index - get </h3>"
-        # a form for username entry and verification
-        username = self.request.get("username")
-        if username and not valid_username:
-            #set error
+        edit_header = "<h3>Signup -H3 Header from the Index - get </h3>"
+        # INITIALIZE ERROR MESSAGES - will this blank out my errror messages
+#        username_err = ""
+#        password_err = ""
+#        verify_password_err = ""
+#        email_err = ""
 
-        password = self.request.get("username")
-
-
-        username_form = """
-        {username}
-        <form action="/signup" method="post">
-            <label>
-                Username:
-                <input type="text" name="username"/>
-                <!-- add an error message display here for invalid username -->
-            </label>
-            <div style="color:red"> {username_err}</div>
-            <br><br>
-
-            <label>
-                Password:
-                <input type="text" name="password"/>
-                <!-- add an error message display here for invalid password & blank out password -->
-            </label>
-            <div style="color:red"> {password_err}</div>
-
-            <label>
-                Verify Password:
-                <input type="text" name="verify_password"/>
-                <!-- add an error message display here for mismatched password & verify_password -->
-            </label>
-            <div style="color:red"> {verify_password_err}</div>
-            <br><br>
-
-            <label>
-                Email (Optional):
-                <input type="text" name="email"/>
-                <!-- add an error message display here for invalid email -->
-            </label>
-            <div style="color:red"> {email_err}</div>
-            <br>
-            <input type="submit" value="Signup"/>
-        </form>
-        """.format(username_err = "Username is invalid. Please enter a valid username.",
-        password_err = "Password is invalid. Please enter a valid password.",
-        verify_password_err = "The password verification does not match. Please try again.",
-        email_err = "The email entered is not valid. Please try again.",
-        username=username)
-
+        username_form = ""
+        username_form  = fill_form()
         page_content = edit_header + username_form
         content = page_header + page_content + page_footer
-        self.response.write(content)
+        self.out.write(content)
 
+def fill_form(username="", email="", username_err="", password_err="", verify_password_err="", email_err=""):
 
+    my_form = """
+    {username}
+    {email}
+    <form action="/signup" method="post">
+        <label>
+            Username:
+            <input type="text" name="username"/>
+        </label>
+        <div style="color:red"> {username_err}</div> <!-- error message for invalid username -->
+        <br><br>
+
+        <label>
+            Password:
+            <input type="text" name="password"/>
+        </label>
+        <div style="color:red"> {password_err}</div> <!-- error message for invalid password & blank out password -->
+
+        <label>
+            Verify Password:
+            <input type="text" name="verify_password"/>
+        </label>
+        <div style="color:red"> {verify_password_err}</div> <!-- error message for mismatched password & verify_password -->
+        <br><br>
+
+        <label>
+            Email (Optional):
+            <input type="text" name="email"/>
+            <!-- add an error message display here for invalid email -->
+        </label>
+        <div style="color:red"> {email_err}</div>
+        <br>
+        <input type="submit" value="Signup"/>
+    </form>
+    """.format(username_err=username_err, password_err=password_err, verify_password_err=verify_password_err,
+    email_err=email_err, username=username, email=email)
+
+    page_content = page_header + my_form + page_footer
+    return(page_content)
+
+##### CHECK USERNAME
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
     return username and USER_RE.match(username)
 
+##### CHECK PASSWORD
 PASS_RE = re.compile(r"^.{3,20}$")
 def valid_password(password):
     return password and PASS_RE.match(password)
 
+##### CHECK EMAIL
 EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
 def valid_email(email):
     return not email or EMAIL_RE.match(email)
 
+#####
 class SignUpHandler(webapp2.RequestHandler):
-
-    def get(self):
-        self.request("signup-form.html")
+    #def get(self):
+    #    self.request("signup-form.html")
+    #return
 
     def post(self):
         have_error = False
@@ -129,54 +132,36 @@ class SignUpHandler(webapp2.RequestHandler):
                       email = email)
 
         if not valid_username(username):
-            params['error_username'] = "That's not a valid username."
+            params['username_err'] = "Username is invalid. Please enter a valid username."
             have_error = True
 
         if not valid_password(password):
-            params['error_password'] = "That wasn't a valid password."
+            params['password_err'] = "Password is invalid. Please enter a valid password."
             have_error = True
         elif password != verify:
-            params['error_verify'] = "Your passwords didn't match."
+            params['verify_password_err'] = "The password verification does not match. Please try again."
             have_error = True
 
         if not valid_email(email):
-            params['error_email'] = "That's not a valid email."
+            params['email_err'] = "The email entered is not valid. Please try again."
             have_error = True
 
         if have_error:
-            self.redirect('/', **params)
+            password = ""
+            verify_password = ""
+            self.redirect('/') # how do I send  or otherwise make sure the pw fields are blanked out???
+            #self.redirect('/', **params) # not sure about this yet
+            #    self.render('signup-form.html', **params) #this from blog.py
         else:
             self.redirect('/welcome?username=' + username)
 
-
 class WelcomeHandler(webapp2.RequestHandler):
     def get(self):
-
-            welcome_form = """
-            {username}
-            <form action="/welcome" method="post">
-                <label>
-                    Username:
-                    <input type="text" name="username"/>
-                    <!-- add an error message display here for invalid username -->
-                </label>
-                <div style="color:red"> {username_err}</div>
-                <br>
-                <input type="submit" value="Welcome"/>
-            </form>
-            """.format(username_err = "Username is invalid. Please enter a valid username.",
-            password_err = "Password is invalid. Please enter a valid password.",
-            verify_password_err = "The password verification does not match. Please try again.",
-            email_err = "The email entered is not valid. Please try again.",
-            username=username)
-
-        # Get username, password, verify_password & email, Check for validity and set error messages???
         username = self.request.get('username')
         if valid_username(username):
-            self.render('welcome.html', username = username)
+            self.out.write("Welcome " + username + "!")
         else:
-            self.redirect('/signup') # send back to initial screen or signup ???
-
+            self.redirect('/') # send back to initial screen or signup -do I send anything with it???
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
