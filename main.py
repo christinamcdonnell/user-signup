@@ -27,7 +27,7 @@ page_header = """
     <title>Signup</title>
 </head>
 <body>
-    <h1>Christina's Fabulous User Signup Heading</h1>
+    <h1>Christina's Stupendous Signup </h1>
 """
 
 # html boilerplate for the bottom of every page
@@ -56,18 +56,18 @@ class MainHandler(webapp2.RequestHandler):
         username_form = ""
         username_form  = fill_form()
         page_content = edit_header + username_form
-        content = page_header + page_content + page_footer
-        self.out.write(content)
+        #content = page_header + page_content + page_footer
+        self.response.write(page_content)
 
 def fill_form(username="", email="", username_err="", password_err="", verify_password_err="", email_err=""):
 
     my_form = """
-    {username}
-    {email}
     <form action="/signup" method="post">
         <label>
+            <div>
             Username:
-            <input type="text" name="username"/>
+            <input type="text" name="username" value="{username}"/>
+            </div>
         </label>
         <div style="color:red"> {username_err}</div> <!-- error message for invalid username -->
         <br><br>
@@ -87,12 +87,12 @@ def fill_form(username="", email="", username_err="", password_err="", verify_pa
 
         <label>
             Email (Optional):
-            <input type="text" name="email"/>
+            <input type="text" name="email" value="{email}"/>
             <!-- add an error message display here for invalid email -->
         </label>
         <div style="color:red"> {email_err}</div>
         <br>
-        <input type="submit" value="Signup"/>
+        <input type="submit" value="JOIN"/>
     </form>
     """.format(username_err=username_err, password_err=password_err, verify_password_err=verify_password_err,
     email_err=email_err, username=username, email=email)
@@ -125,7 +125,7 @@ class SignUpHandler(webapp2.RequestHandler):
         have_error = False
         username = self.request.get('username')
         password = self.request.get('password')
-        verify = self.request.get('verify')
+        verify_password = self.request.get('verify_password')
         email = self.request.get('email')
 
         params = dict(username = username,
@@ -138,7 +138,7 @@ class SignUpHandler(webapp2.RequestHandler):
         if not valid_password(password):
             params['password_err'] = "Password is invalid. Please enter a valid password."
             have_error = True
-        elif password != verify:
+        elif password != verify_password:
             params['verify_password_err'] = "The password verification does not match. Please try again."
             have_error = True
 
@@ -149,7 +149,9 @@ class SignUpHandler(webapp2.RequestHandler):
         if have_error:
             password = ""
             verify_password = ""
-            self.redirect('/') # how do I send  or otherwise make sure the pw fields are blanked out???
+            SignUp_form = fill_form( **params)
+            self.response.write(SignUp_form)
+            #self.redirect('/') # how do I send  or otherwise make sure the pw fields are blanked out???
             #self.redirect('/', **params) # not sure about this yet
             #    self.render('signup-form.html', **params) #this from blog.py
         else:
@@ -159,7 +161,7 @@ class WelcomeHandler(webapp2.RequestHandler):
     def get(self):
         username = self.request.get('username')
         if valid_username(username):
-            self.out.write("Welcome " + username + "!")
+            self.response.write("Welcome " + username + "!")
         else:
             self.redirect('/') # send back to initial screen or signup -do I send anything with it???
 
