@@ -63,7 +63,7 @@ def fill_form(username="", email="", username_err="", password_err="", verify_pa
 
     my_form = """
     <form action="/signup" method="post">
-        <div  background-color="LightCoral">
+        <div style="background-color:LightCoral">
         <br>
             <label>
                     Username:
