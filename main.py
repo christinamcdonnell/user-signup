@@ -46,7 +46,7 @@ class MainHandler(webapp2.RequestHandler):
         e.g. www.usersignup.com/
     """
     def get(self):
-        edit_header = "<h3>Signup -H3 Header from the Index - get </h3>"
+        #edit_header = "<h3>Signup -H3 Header from the Index - get </h3>"
         # INITIALIZE ERROR MESSAGES - will this blank out my errror messages
 #        username_err = ""
 #        password_err = ""
@@ -55,42 +55,44 @@ class MainHandler(webapp2.RequestHandler):
 
         username_form = ""
         username_form  = fill_form()
-        page_content = edit_header + username_form
+        #page_content = edit_header + username_form
         #content = page_header + page_content + page_footer
-        self.response.write(page_content)
+        self.response.write(username_form)
 
 def fill_form(username="", email="", username_err="", password_err="", verify_password_err="", email_err=""):
 
     my_form = """
     <form action="/signup" method="post">
-        <label>
-            <div>
-            Username:
-            <input type="text" name="username" value="{username}"/>
-            </div>
-        </label>
-        <div style="color:red"> {username_err}</div> <!-- error message for invalid username -->
-        <br><br>
+        <div  background-color="LightCoral">
+        <br>
+            <label>
+                    Username:
+                    <input type="text" name="username" value="{username}"/>
+            </label><br>
+            <div style="color:red"> {username_err}</div> <!-- error message for invalid username -->
+            <br><br>
 
-        <label>
-            Password:
-            <input type="text" name="password"/>
-        </label>
-        <div style="color:red"> {password_err}</div> <!-- error message for invalid password & blank out password -->
+            <label>
+                Password:
+                <input type="password" name="password"/>
+            </label>
+            <div style="color:red"> {password_err}</div> <!-- error message for invalid password & blank out password -->
+            <br>
 
-        <label>
-            Verify Password:
-            <input type="text" name="verify_password"/>
-        </label>
-        <div style="color:red"> {verify_password_err}</div> <!-- error message for mismatched password & verify_password -->
-        <br><br>
+            <label>
+                Verify Password:
+                <input type="password" name="verify_password"/>
+            </label>
+            <div style="color:red"> {verify_password_err}</div> <!-- error message for mismatched password & verify_password -->
+            <br><br>
 
-        <label>
-            Email (Optional):
-            <input type="text" name="email" value="{email}"/>
-            <!-- add an error message display here for invalid email -->
-        </label>
-        <div style="color:red"> {email_err}</div>
+            <label>
+                Email (Optional):
+                <input type="text" name="email" value="{email}"/>
+                <!-- add an error message display here for invalid email -->
+            </label>
+            <div style="color:red"> {email_err}</div>
+        <div>
         <br>
         <input type="submit" value="JOIN"/>
     </form>
